@@ -1,6 +1,7 @@
 package com.webcloud.tinygram;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -22,6 +23,8 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
+import com.google.appengine.repackaged.com.google.datastore.v1.PropertyFilter;
+import com.google.apphosting.datastore.DatastoreV4;
 
 @Api(
     name = "myApi",
@@ -121,6 +124,29 @@ public class MyApi {
         datastore.put(e2);
         return e;
     }
+
+    /**
+     * Récupérer des amis non suivis par l'utilisateur
+     * @param email
+     * @return
+     */
+    @ApiMethod(name = "friendsToFollow", path = "friends/{email}", httpMethod = HttpMethod.GET)
+    public List<Entity> friendsToFollow(@Named("email") String email){
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        ArrayList<Entity> result = new ArrayList<>();
+
+        Query q = new Query("Friend")
+                .setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, Arrays.asList(
+                        new FilterPredicate("email", FilterOperator.NOT_EQUAL, email),
+                        new FilterPredicate("following", FilterOperator.NOT_EQUAL, email))
+                ));
+
+        PreparedQuery pq = datastore.prepare(q);
+        result.addAll(pq.asList(FetchOptions.Builder.withLimit(50)));
+        return result;
+    }
+
+
 
     // --------- GESTION DES POSTS --------
 
