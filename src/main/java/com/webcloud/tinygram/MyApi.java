@@ -136,11 +136,8 @@ public class MyApi {
         ArrayList<Entity> result = new ArrayList<>();
 
         Query q = new Query("Friend")
-                .setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, Arrays.asList(
-                        new FilterPredicate("email", FilterOperator.NOT_EQUAL, email),
-                        new FilterPredicate("following", FilterOperator.NOT_EQUAL, email))
-                ));
-
+                .setFilter(new FilterPredicate("followers", FilterOperator.NOT_EQUAL, email)
+                );
         PreparedQuery pq = datastore.prepare(q);
         result.addAll(pq.asList(FetchOptions.Builder.withLimit(50)));
         return result;
