@@ -105,10 +105,13 @@ public class MyApi {
         if (list == null) {
             list = new ArrayList<String>();
         }
+        if(!list.contains(follow)){
+            list.add(follow);
+            e.setProperty("following", list);
+            e.setProperty("cptFollowing", (long) e.getProperty("cptFollowing")+1);
+            datastore.put(e);
+        }
 
-        list.add(follow);
-        e.setProperty("following", list);
-        e.setProperty("cptFollowing", (long) e.getProperty("cptFollowing")+1);
 
 
         Key key2 = KeyFactory.createKey("Friend", follow);
@@ -117,12 +120,13 @@ public class MyApi {
         if (listFollowers == null) {
             listFollowers = new ArrayList<String>();
         }
-        listFollowers.add(email);
-        e2.setProperty("followers", listFollowers);
-        e2.setProperty("cptFollower", (long) e.getProperty("cptFollower")+1);
+        if(!listFollowers.contains(email)){
+            listFollowers.add(email);
+            e2.setProperty("followers", listFollowers);
+            e2.setProperty("cptFollower", (long) e.getProperty("cptFollower")+1);
+            datastore.put(e2);
+        }
 
-        datastore.put(e);
-        datastore.put(e2);
         return e;
     }
 
