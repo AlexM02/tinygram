@@ -182,6 +182,12 @@ public class MyApi {
 
         Transaction txn = datastore.beginTransaction();
         Entity e = datastore.get(key);
+        ArrayList<String> personWhoLike = (ArrayList<String>) e.getProperty("listeAime");
+        if(personWhoLike==null){
+            personWhoLike = new ArrayList<String>();
+        }
+        personWhoLike.add(like.email);
+        e.setProperty("listeAime",personWhoLike);
         long likes = (long) e.getProperty("likes") + 1;
         e.setProperty("likes", likes);
         datastore.put(e);
