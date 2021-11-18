@@ -160,6 +160,7 @@ public class MyApi {
         Key key = KeyFactory.createKey("Friend", post.email);
         user = datastore.get(key);
 
+        Date d = new Date();
         Entity e = new Entity("Post", post.email + ":" + d);
 
         e.setProperty("email", post.email);
@@ -167,9 +168,8 @@ public class MyApi {
         e.setProperty("image", post.image);
         e.setProperty("description", post.description);
         e.setProperty("cptLikes", 0);
-        Date d = new Date();
         e.setProperty("date", d);
-        e.setProperty("listeDiffusion",new ArrayList<String>());
+        e.setProperty("listeDiffusion",user.getProperty("followers"));
         e.setProperty("listeAime",new ArrayList<String>());
         datastore.put(e);
         return e;
