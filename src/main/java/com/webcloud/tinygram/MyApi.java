@@ -159,16 +159,15 @@ public class MyApi {
         Key key = KeyFactory.createKey("Friend", post.email);
         user = datastore.get(key);
 
-        Timestamp t = new Timestamp(new Date().getTime());
-        Entity e = new Entity("Post", t+":"+post.email);
+        Date d = new Date();
+        Entity e = new Entity("Post", d+":"+post.email);
 
         e.setProperty("email", post.email);
         e.setProperty("pseudo", user.getProperty("name"));
         e.setProperty("image", post.image);
         e.setProperty("description", post.description);
         e.setProperty("cptLikes", 0);
-        e.setProperty("date", t);
-        e.setProperty("dateString", new Date());
+        e.setProperty("date", d);
         e.setProperty("listeDiffusion",user.getProperty("followers"));
         e.setProperty("listeAime",new ArrayList<String>());
         datastore.put(e);
@@ -202,7 +201,7 @@ public class MyApi {
 
         Query q = new Query("Post")
                 .setFilter(new FilterPredicate("listeDiffusion", FilterOperator.EQUAL, email))
-                .addSort("date",SortDirection.DESCENDING);
+                .addSort("__key__",SortDirection.DESCENDING);
 
         PreparedQuery pq = datastore.prepare(q);
         result.addAll(pq.asList(FetchOptions.Builder.withLimit(15).offset(offset)));
@@ -216,7 +215,6 @@ public class MyApi {
                     en.setProperty("aAime",false);
                 }
             }
-            en.removeProperty("date");
             en.removeProperty("listeDiffusion");
             en.removeProperty("listeAime");
         }
