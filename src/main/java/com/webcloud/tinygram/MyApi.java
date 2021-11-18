@@ -195,23 +195,18 @@ public class MyApi {
         return e;
     }
 
-    @ApiMethod(name = "post", path = "post/{email}", httpMethod = HttpMethod.GET)
-    public List<Entity> post(@Named("email") String email) throws EntityNotFoundException {
+    @ApiMethod(name = "post", path = "post/{email}/{offset}", httpMethod = HttpMethod.GET)
+    public List<Entity> post(@Named("email") String email,@Named("offset") int offset){
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        Key key = KeyFactory.createKey("Friend", email);
-        Entity e = datastore.get(key);
-        ArrayList<String> list = (ArrayList) e.getProperty("follow");
         ArrayList<Entity> result = new ArrayList<>();
 
-        if (list != null) {
-            for (String follow : list) {
-                Query q = new Query("Post")
-                    .setFilter(new FilterPredicate("email", FilterOperator.EQUAL, follow));
-                    //.addSort("date", SortDirection.ASCENDING);
-                PreparedQuery pq = datastore.prepare(q);
-		        result.addAll(pq.asList(FetchOptions.Builder.withDefaults()));
-            }
-        }
+        Query q = new Query("Post")
+                .setFilter(new FilterPredicate("listeDiffusion", FilterOperator.EQUAL, email))
+                .addSort("date",SortDirection.DESCENDING);
+
+        PreparedQuery pq = datastore.prepare(q);
+        result.addAll(pq.asList(FetchOptions.Builder.withLimit(15).offset(offset)));
+
         return result;
     }
 }
