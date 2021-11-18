@@ -153,15 +153,24 @@ public class MyApi {
     // --------- GESTION DES POSTS --------
 
     @ApiMethod(name = "addPost", path = "post", httpMethod = HttpMethod.POST)
-    public Entity addPost(Post post) {
-        Date d = new Date();
+    public Entity addPost(Post post) throws EntityNotFoundException {
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+        Entity user ;
+        Key key = KeyFactory.createKey("Friend", post.email);
+        user = datastore.get(key);
+
         Entity e = new Entity("Post", post.email + ":" + d);
+
         e.setProperty("email", post.email);
+        e.setProperty("pseudo", user.getProperty("name"));
         e.setProperty("image", post.image);
         e.setProperty("description", post.description);
-        e.setProperty("likes", 0);
+        e.setProperty("cptLikes", 0);
+        Date d = new Date();
         e.setProperty("date", d);
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        e.setProperty("listeDiffusion",new ArrayList<String>());
+        e.setProperty("listeAime",new ArrayList<String>());
         datastore.put(e);
         return e;
     }
