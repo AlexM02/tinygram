@@ -1,7 +1,7 @@
 package com.webcloud.tinygram;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -23,8 +23,7 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
-import com.google.appengine.repackaged.com.google.datastore.v1.PropertyFilter;
-import com.google.apphosting.datastore.DatastoreV4;
+
 
 @Api(
     name = "myApi",
@@ -160,24 +159,25 @@ public class MyApi {
         Key key = KeyFactory.createKey("Friend", post.email);
         user = datastore.get(key);
 
-        Date d = new Date();
-        Entity e = new Entity("Post", post.email + ":" + d);
+        Timestamp t = new Timestamp(new Date().getTime());
+        Entity e = new Entity("Post", t+":"+post.email);
 
         e.setProperty("email", post.email);
         e.setProperty("pseudo", user.getProperty("name"));
         e.setProperty("image", post.image);
         e.setProperty("description", post.description);
         e.setProperty("cptLikes", 0);
-        e.setProperty("date", d);
+        e.setProperty("date", t);
+        e.setProperty("dateString", new Date());
         e.setProperty("listeDiffusion",user.getProperty("followers"));
         e.setProperty("listeAime",new ArrayList<String>());
         datastore.put(e);
         return e;
     }
 
-    @ApiMethod(name = "putPost", path = "post", httpMethod = HttpMethod.PUT)
+    @ApiMethod(name = "putPost", path = "post/like", httpMethod = HttpMethod.PUT)
     public Entity addLike(Like like) throws EntityNotFoundException {
-        Key key = KeyFactory.createKey("Post", like.email + ":" + like.date);
+        Key key = KeyFactory.createKey("Post", like.emailCreateurPhoto + ":" + like.datePhoto);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         Transaction txn = datastore.beginTransaction();
@@ -186,7 +186,7 @@ public class MyApi {
         if(personWhoLike==null){
             personWhoLike = new ArrayList<String>();
         }
-        personWhoLike.add(like.email);
+        personWhoLike.add(like.emailUserQuiLike);
         e.setProperty("listeAime",personWhoLike);
         long likes = (long) e.getProperty("likes") + 1;
         e.setProperty("likes", likes);
@@ -206,6 +206,20 @@ public class MyApi {
 
         PreparedQuery pq = datastore.prepare(q);
         result.addAll(pq.asList(FetchOptions.Builder.withLimit(15).offset(offset)));
+
+        for(Entity en : result){
+            if(en.getProperty("listeAime") !=null){
+                ArrayList<String> personneQuiAime = (ArrayList<String>) en.getProperty("listeAime");
+                if(personneQuiAime.contains(email)){
+                    en.setProperty("aAime",true);
+                }else{
+                    en.setProperty("aAime",false);
+                }
+            }
+            en.removeProperty("date");
+            en.removeProperty("listeDiffusion");
+            en.removeProperty("listeAime");
+        }
 
         return result;
     }
