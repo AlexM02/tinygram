@@ -201,7 +201,7 @@ public class MyApi {
 
         Query q = new Query("Post")
                 .setFilter(new FilterPredicate("listeDiffusion", FilterOperator.EQUAL, email))
-                .addSort("__key__",SortDirection.DESCENDING);
+                .addSort("date",SortDirection.DESCENDING);
 
         PreparedQuery pq = datastore.prepare(q);
         result.addAll(pq.asList(FetchOptions.Builder.withLimit(15).offset(offset)));
