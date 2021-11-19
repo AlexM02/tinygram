@@ -180,13 +180,14 @@ public class MyApi {
         Entity e;
         Key key = KeyFactory.createKey("Post", like.datePhoto+":"+like.emailCreateurPhoto);
         e = datastore.get(key);
-        /**
+
        ArrayList<String> personWhoLike = (ArrayList<String>) e.getProperty("listeAime");
         if(personWhoLike==null){
             personWhoLike = new ArrayList<String>();
         }
         personWhoLike.add(like.emailUserQuiLike);
-        e.setProperty("listeAime",personWhoLike);*/
+        e.setProperty("listeAime",personWhoLike);
+
         e.setProperty("cptLikes", (long) e.getProperty("cptLikes") + 1);
         datastore.put(e);
         return e;
