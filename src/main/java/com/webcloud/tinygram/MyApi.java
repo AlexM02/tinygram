@@ -187,7 +187,7 @@ public class MyApi {
         }
         personWhoLike.add(like.emailUserQuiLike);
         e.setProperty("listeAime",personWhoLike);*/
-        e.setProperty("cptLikes", (long) e.getProperty("likes") + 1);
+        e.setProperty("cptLikes", (long) e.getProperty("cptLikes") + 1);
         datastore.put(e);
         return e;
     }
