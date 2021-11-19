@@ -1,6 +1,8 @@
 package com.webcloud.tinygram;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -160,7 +162,9 @@ public class MyApi {
         user = datastore.get(key);
 
         Date d = new Date();
-        Entity e = new Entity("Post", d+":"+post.email);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        String strDate = dateFormat.format(d);
+        Entity e = new Entity("Post", strDate+":"+post.email);
 
         e.setProperty("email", post.email);
         e.setProperty("pseudo", user.getProperty("name"));
