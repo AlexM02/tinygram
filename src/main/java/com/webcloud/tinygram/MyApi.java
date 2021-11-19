@@ -187,10 +187,11 @@ public class MyApi {
         if(personWhoLike==null){
             personWhoLike = new ArrayList<String>();
         }
-        personWhoLike.add(like.emailUserQuiLike);
+        if(!personWhoLike.contains(like.emailUserQuiLike)){
+            personWhoLike.add(like.emailUserQuiLike);
+            e.setProperty("cptLikes", (long) e.getProperty("cptLikes") + 1);
+        }
         e.setProperty("listeAime",personWhoLike);
-
-        e.setProperty("cptLikes", (long) e.getProperty("cptLikes") + 1);
         datastore.put(e);
         txn.commit();
         return e;
