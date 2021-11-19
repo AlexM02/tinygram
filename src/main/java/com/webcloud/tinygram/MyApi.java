@@ -176,7 +176,7 @@ public class MyApi {
 
     @ApiMethod(name = "putPost", path = "post/like", httpMethod = HttpMethod.PUT)
     public Entity addLike(Like like) throws EntityNotFoundException {
-        Key key = KeyFactory.createKey("Post", like.emailCreateurPhoto + ":" + like.datePhoto);
+        Key key = KeyFactory.createKey("Post", like.datePhoto+":"+like.emailCreateurPhoto);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         Transaction txn = datastore.beginTransaction();
