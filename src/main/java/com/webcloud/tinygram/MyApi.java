@@ -163,7 +163,7 @@ public class MyApi {
 
         Date d = new Date();
         Timestamp t = new Timestamp(d.getTime());
-        Entity e = new Entity("Post", t+":"+post.email);
+        Entity e = new Entity("Post", t.toString()+":"+post.email);
 
         e.setProperty("email", post.email);
         e.setProperty("pseudo", user.getProperty("name"));
