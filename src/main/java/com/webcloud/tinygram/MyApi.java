@@ -176,10 +176,10 @@ public class MyApi {
 
     @ApiMethod(name = "putPost", path = "post/like", httpMethod = HttpMethod.PUT)
     public Entity addLike(Like like) throws EntityNotFoundException {
-        Key key = KeyFactory.createKey("Post", like.datePhoto+":"+like.emailCreateurPhoto);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
-        Entity e = datastore.get(key);
+        Entity e;
+        Key key = KeyFactory.createKey("Post", like.datePhoto+":"+like.emailCreateurPhoto);
+        e = datastore.get(key);
 
         ArrayList<String> personWhoLike = (ArrayList<String>) e.getProperty("listeAime");
         if(personWhoLike==null){
@@ -187,9 +187,7 @@ public class MyApi {
         }
         personWhoLike.add(like.emailUserQuiLike);
         e.setProperty("listeAime",personWhoLike);
-
-        long likes = (long) e.getProperty("likes") + 1;
-        e.setProperty("likes", likes);
+        e.setProperty("likes", (long) e.getProperty("likes") + 1);
         datastore.put(e);
         return e;
     }
