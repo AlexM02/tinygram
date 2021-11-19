@@ -180,17 +180,16 @@ public class MyApi {
         Entity e;
         Key key = KeyFactory.createKey("Post", like.datePhoto+":"+like.emailCreateurPhoto);
         e = datastore.get(key);
-        return e;
-
-       /** ArrayList<String> personWhoLike = (ArrayList<String>) e.getProperty("listeAime");
+        /**
+       ArrayList<String> personWhoLike = (ArrayList<String>) e.getProperty("listeAime");
         if(personWhoLike==null){
             personWhoLike = new ArrayList<String>();
         }
         personWhoLike.add(like.emailUserQuiLike);
-        e.setProperty("listeAime",personWhoLike);
-        e.setProperty("likes", (long) e.getProperty("likes") + 1);
-        datastore.put(e);*/
-
+        e.setProperty("listeAime",personWhoLike);*/
+        e.setProperty("cptLikes", (long) e.getProperty("likes") + 1);
+        datastore.put(e);
+        return e;
     }
 
     @ApiMethod(name = "post", path = "post/{email}/{offset}", httpMethod = HttpMethod.GET)
