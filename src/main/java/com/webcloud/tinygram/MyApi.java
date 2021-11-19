@@ -162,8 +162,7 @@ public class MyApi {
         user = datastore.get(key);
 
         Date d = new Date();
-        Timestamp t = new Timestamp(d.getTime());
-        Entity e = new Entity("Post", t.toString()+":"+post.email);
+        Entity e = new Entity("Post", d.getTime()+":"+post.email);
 
         e.setProperty("email", post.email);
         e.setProperty("pseudo", user.getProperty("name"));
