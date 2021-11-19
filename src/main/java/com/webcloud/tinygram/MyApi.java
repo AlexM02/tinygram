@@ -179,21 +179,18 @@ public class MyApi {
         Key key = KeyFactory.createKey("Post", like.datePhoto+":"+like.emailCreateurPhoto);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-        Transaction txn = datastore.beginTransaction();
         Entity e = datastore.get(key);
 
-        /**
         ArrayList<String> personWhoLike = (ArrayList<String>) e.getProperty("listeAime");
         if(personWhoLike==null){
             personWhoLike = new ArrayList<String>();
         }
         personWhoLike.add(like.emailUserQuiLike);
-        e.setProperty("listeAime",personWhoLike);*/
+        e.setProperty("listeAime",personWhoLike);
 
         long likes = (long) e.getProperty("likes") + 1;
         e.setProperty("likes", likes);
         datastore.put(e);
-        txn.commit();
         return e;
     }
 
