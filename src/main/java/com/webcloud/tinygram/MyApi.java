@@ -1,8 +1,6 @@
 package com.webcloud.tinygram;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -132,20 +130,32 @@ public class MyApi {
     }
 
     /**
-     * Récupérer des amis non suivis par l'utilisateur
+     * Récupérer des users de l'application
      * @param email
      * @return
      */
-    @ApiMethod(name = "friendsToFollow", path = "friends/{email}", httpMethod = HttpMethod.GET)
-    public List<Entity> friendsToFollow(@Named("email") String email){
+    @ApiMethod(name = "friendsToFollow", path = "friends/{email}/{offset}", httpMethod = HttpMethod.GET)
+    public List<Entity> friendsToFollow(@Named("email") String email,@Named("offset") int offset) throws EntityNotFoundException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         ArrayList<Entity> result = new ArrayList<>();
 
+        Key key = KeyFactory.createKey("Friend", email);
+        Entity e = datastore.get(key);
+        ArrayList<String> following = (ArrayList<String>) e.getProperty("following");
+
         Query q = new Query("Friend")
-                .setFilter(new FilterPredicate("followers", FilterOperator.NOT_EQUAL, email)
+                .setFilter(new FilterPredicate("email", FilterOperator.NOT_EQUAL, email)
                 );
         PreparedQuery pq = datastore.prepare(q);
-        result.addAll(pq.asList(FetchOptions.Builder.withLimit(50)));
+        result.addAll(pq.asList(FetchOptions.Builder.withLimit(30).offset(offset)));
+
+        if(following != null){
+            for(Entity en : result){
+                if(following.contains(en.getProperty("email"))){
+                    en.setProperty("isFollowing",true);
+                }
+            }
+        }
         return result;
     }
 
