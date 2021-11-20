@@ -175,6 +175,7 @@ public class MyApi {
         Entity e = new Entity("Post", d.getTime()+":"+post.email);
 
         e.setProperty("email", post.email);
+        e.setProperty("profilImageLink",user.getProperty("imageUrl"));
         e.setProperty("pseudo", user.getProperty("name"));
         e.setProperty("image", post.image);
         e.setProperty("description", post.description);
