@@ -47,8 +47,8 @@ public class MyApi {
      * @param friend
      * @return
      */
-    @ApiMethod(name = "addFriend", path = "friend", httpMethod = HttpMethod.POST)
-    public Entity addFriend(GoogleObject friend) {
+    @ApiMethod(name = "createUser", path = "friend", httpMethod = HttpMethod.POST)
+    public Entity createUser(GoogleObject friend) {
         Entity e = new Entity("Friend", friend.email);
         e.setProperty("email", friend.email);
         e.setProperty("firstName", friend.givenName);
@@ -70,18 +70,23 @@ public class MyApi {
      * @param friend
      * @return
      */
-    @ApiMethod(name = "friend", path = "friend/{email}", httpMethod = HttpMethod.POST)
-    public Entity friend(@Named("email")  String email, GoogleObject friend)  {
+    @ApiMethod(name = "getUser", path = "friend/{email}", httpMethod = HttpMethod.POST)
+    public Entity getUser(@Named("email")  String email, GoogleObject friend)  {
+        if(email == null || email.equals("")){
+            return null;
+        }
+
         if(!email.equals(friend.email)){
             return null;
         }
+
         Key key = KeyFactory.createKey("Friend", friend.email);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Entity e ;
         try{
             e = datastore.get(key);
         }catch(EntityNotFoundException ex){
-            e = addFriend(friend);
+            e = createUser(friend);
         }
         datastore.put(e);
         return e;
@@ -97,7 +102,7 @@ public class MyApi {
     @ApiMethod(name = "addFollow", path = "friend/{email}", httpMethod = HttpMethod.PUT)
     public Entity addFollow(@Named("email") String email,@Named("follow") String follow) throws EntityNotFoundException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
+        Transaction txn = datastore.beginTransaction();
         Key key = KeyFactory.createKey("Friend", email);
         Entity e = datastore.get(key);
         ArrayList<String> list = (ArrayList<String>) e.getProperty("following");
@@ -110,21 +115,22 @@ public class MyApi {
             e.setProperty("cptFollowing", (long) e.getProperty("cptFollowing")+1);
             datastore.put(e);
         }
+        txn.commit();
 
-
-
+        txn = datastore.beginTransaction();
         Key key2 = KeyFactory.createKey("Friend", follow);
         Entity e2 = datastore.get(key2);
-        ArrayList<String> listFollowers = (ArrayList<String>) e.getProperty("followers");
+        ArrayList<String> listFollowers = (ArrayList<String>) e2.getProperty("followers");
         if (listFollowers == null) {
             listFollowers = new ArrayList<String>();
         }
         if(!listFollowers.contains(email)){
             listFollowers.add(email);
             e2.setProperty("followers", listFollowers);
-            e2.setProperty("cptFollower", (long) e.getProperty("cptFollower")+1);
+            e2.setProperty("cptFollower", (long) e2.getProperty("cptFollower")+1);
             datastore.put(e2);
         }
+        txn.commit();
 
         return e;
     }
@@ -187,7 +193,7 @@ public class MyApi {
         return e;
     }
 
-    @ApiMethod(name = "putPost", path = "post/like", httpMethod = HttpMethod.PUT)
+    @ApiMethod(name = "addLike", path = "post/like", httpMethod = HttpMethod.PUT)
     public Entity addLike(Like like) throws EntityNotFoundException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
@@ -210,8 +216,8 @@ public class MyApi {
         return e;
     }
 
-    @ApiMethod(name = "post", path = "post/{email}/{offset}", httpMethod = HttpMethod.GET)
-    public List<Entity> post(@Named("email") String email,@Named("offset") int offset){
+    @ApiMethod(name = "getPost", path = "post/{email}/{offset}", httpMethod = HttpMethod.GET)
+    public List<Entity> getPost(@Named("email") String email,@Named("offset") int offset){
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         ArrayList<Entity> result = new ArrayList<>();
 
