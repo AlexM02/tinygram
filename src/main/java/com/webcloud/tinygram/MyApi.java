@@ -55,7 +55,9 @@ public class MyApi {
         e.setProperty("lastName", friend.familyName);
         e.setProperty("name", friend.name);
         e.setProperty("imageUrl",friend.imageUrl);
-        e.setProperty("followers", new ArrayList<String>());
+        ArrayList<String> followers = new ArrayList<>();
+        followers.add(friend.email);
+        e.setProperty("followers", followers);
         e.setProperty("following", new ArrayList<String>());
         e.setProperty("cptFollowing", 0);
         e.setProperty("cptFollower", 0);
@@ -66,17 +68,12 @@ public class MyApi {
 
     /**
      * Get a user
-     * @param email
      * @param friend
      * @return
      */
-    @ApiMethod(name = "getUser", path = "friend/{email}", httpMethod = HttpMethod.POST)
-    public Entity getUser(@Named("email")  String email, GoogleObject friend)  {
-        if(email == null || email.equals("")){
-            return null;
-        }
-
-        if(!email.equals(friend.email)){
+    @ApiMethod(name = "getUser", path = "getUser", httpMethod = HttpMethod.POST)
+    public Entity getUser(GoogleObject friend)  {
+        if(friend.email == null || friend.email.equals("")){
             return null;
         }
 
@@ -85,6 +82,9 @@ public class MyApi {
         Entity e ;
         try{
             e = datastore.get(key);
+            if(friend.imageUrl != null && !friend.imageUrl.equals("")){
+                e.setProperty("imageUrl",friend.imageUrl);
+            }
         }catch(EntityNotFoundException ex){
             e = createUser(friend);
         }
@@ -103,6 +103,8 @@ public class MyApi {
     public Entity addFollow(@Named("email") String email,@Named("follow") String follow) throws EntityNotFoundException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Transaction txn = datastore.beginTransaction();
+
+        //Traitement de l'utilisateur qui follow
         Key key = KeyFactory.createKey("Friend", email);
         Entity e = datastore.get(key);
         ArrayList<String> list = (ArrayList<String>) e.getProperty("following");
@@ -117,6 +119,7 @@ public class MyApi {
         }
         txn.commit();
 
+        //Traitement de l'utilisateur followé
         txn = datastore.beginTransaction();
         Key key2 = KeyFactory.createKey("Friend", follow);
         Entity e2 = datastore.get(key2);
@@ -131,6 +134,26 @@ public class MyApi {
             datastore.put(e2);
         }
         txn.commit();
+
+        /**
+         * Ajouté l'utilisateur qui follow dans les listes de diffusions de toutes les photos de l'utilisateur followé
+         */
+        ArrayList<Entity> result = new ArrayList<>();
+        Query q = new Query("Post")
+                .setFilter(new FilterPredicate("email", FilterOperator.EQUAL, follow)
+                );
+        PreparedQuery pq = datastore.prepare(q);
+        //On ajoute l'user dans les 20 derniers posts de l'utilisateur qu'il follow
+        result.addAll(pq.asList(FetchOptions.Builder.withLimit(20)));
+        for(Entity ent : result){
+            ArrayList<String> listeDiff = (ArrayList<String>) ent.getProperty("listeDiffusion");
+            if(listeDiff == null){
+                listeDiff = new ArrayList<>();
+            }
+            listeDiff.add(email);
+            ent.setProperty("listeDiffusion",listeDiff);
+            datastore.put(ent);
+        }
 
         return e;
     }
