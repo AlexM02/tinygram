@@ -27,6 +27,7 @@ How much time does it take to post a message if followed by 10, 100, and 500 fol
 91,078839 ms 
 
 100 personnes : 
+156,8347139333330063 ms
 
 500 personnes :
 
