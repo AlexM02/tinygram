@@ -23,6 +23,13 @@ Alex MAINGUY - Lucas LELIÈVRE - Thomas LAPIERRE
 
 How much time does it take to post a message if followed by 10, 100, and 500 followers? (average on 30 measures)
 
+10 personnes : 
+91,078839 ms 
+
+100 personnes : 
+
+500 personnes :
+
 How much time does it take to retrieve the last 10,100 and 500 last messages? (average of 30 measures)
 
 How much “likes” can you do per second ?? (average on 30 measures)
