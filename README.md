@@ -1,5 +1,7 @@
 # Tinygram
 
+Alex MAINGUY - Lucas LELIÈVRE - Thomas LAPIERRE
+
 ## Commandes de déploiement
 
 ``` mvn clean package```
