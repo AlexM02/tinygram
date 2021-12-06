@@ -269,7 +269,7 @@ public class MyApi {
 
     //BENCHMARK PART
     @ApiMethod(name = "benchmarkCreateUserXFollowers", path = "benchmark/Xfollowers/{nbFollower}", httpMethod = HttpMethod.GET)
-    public Entity createUser10Followers(@Named("nbFollower") int nbFollower){
+    public Entity createUserXFollowers(@Named("nbFollower") int nbFollower){
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         String email = randomEmail();
