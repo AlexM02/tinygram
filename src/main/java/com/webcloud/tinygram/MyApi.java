@@ -239,8 +239,8 @@ public class MyApi {
         return e;
     }
 
-    @ApiMethod(name = "getPost", path = "post/{email}/{offset}", httpMethod = HttpMethod.GET)
-    public List<Entity> getPost(@Named("email") String email,@Named("offset") int offset){
+    @ApiMethod(name = "getPost", path = "post/{email}/{offset}/{limit}", httpMethod = HttpMethod.GET)
+    public List<Entity> getPost(@Named("email") String email,@Named("offset") int offset,@Named("limit") int limit){
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         ArrayList<Entity> result = new ArrayList<>();
 
@@ -249,7 +249,7 @@ public class MyApi {
                 .addSort("date",SortDirection.DESCENDING);
 
         PreparedQuery pq = datastore.prepare(q);
-        result.addAll(pq.asList(FetchOptions.Builder.withLimit(15).offset(offset)));
+        result.addAll(pq.asList(FetchOptions.Builder.withLimit(limit).offset(offset)));
 
         for(Entity en : result){
             if(en.getProperty("listeAime") !=null){
@@ -266,4 +266,67 @@ public class MyApi {
 
         return result;
     }
+
+    //BENCHMARK PART
+    @ApiMethod(name = "benchmarkCreateUserXFollowers", path = "benchmark/Xfollowers/{nbFollower}", httpMethod = HttpMethod.GET)
+    public Entity createUser10Followers(@Named("nbFollower") int nbFollower){
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+        String email = randomEmail();
+        GoogleObject go = new GoogleObject(email,"testFamilyName"+email.substring(1,8),
+                "testGivenName"+email.substring(1,8),"","name"+email.substring(1,8));
+        Entity e = createUser(go);
+
+        ArrayList<String> followers = new ArrayList<>();
+        for(int i =0;i<nbFollower;i++){
+            followers.add(randomEmail());
+        }
+        e.setProperty("followers",followers);
+        datastore.put(e);
+
+        return e;
+    }
+
+    private String randomEmail(){
+        String[] firstLetter = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v"};
+        String email = firstLetter[(int) (Math.random() * 21)];
+        email+= Math.random() * 99 ;
+        email+= "@gmail.com";
+        return email;
+    }
+
+    @ApiMethod(name = "benchmarkPost", path = "benchmark/post", httpMethod = HttpMethod.POST)
+    public long benchmarkPost(Post post) throws EntityNotFoundException {
+        long startTime = System.nanoTime();
+        addPost(post);
+        long stopTime = System.nanoTime();
+        return stopTime - startTime;
+    }
+
+    @ApiMethod(name = "benchmarkCreate500Post", path = "benchmark/create500post/{email}", httpMethod = HttpMethod.POST)
+    public void create500Post(Post post,@Named("email") String email) throws EntityNotFoundException, InterruptedException {
+        for(int i = 0; i<250;i++){
+            addPost(post);
+            //pour aller deux fois plus vite
+            post.email = email;
+            addPost(post);
+            /**
+             * pour eviter un probleme de clé car c'est impossible en temps normal qu'un même utilisateur insère
+             * des photos à la même seconde
+             */
+            Thread.sleep(1000);
+        }
+    }
+
+    @ApiMethod(name = "benchmarkGetPost", path = "benchmark/getPost/{nbPost}", httpMethod = HttpMethod.POST)
+    public long benchmarkPost(@Named("email") String email,
+                              @Named("offset") int offset,@Named("nbPost") int nbPost) throws EntityNotFoundException {
+        long startTime = System.nanoTime();
+        getPost(email,offset,nbPost);
+        long stopTime = System.nanoTime();
+        return stopTime - startTime;
+    }
+
+
+
 }

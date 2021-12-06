@@ -8,4 +8,11 @@ public class GoogleObject {
     public String imageUrl ;
     public String name;
 
+    public GoogleObject(String email, String familyName, String givenName, String imageUrl, String name) {
+        this.email = email;
+        this.familyName = familyName;
+        this.givenName = givenName;
+        this.imageUrl = imageUrl;
+        this.name = name;
+    }
 }
