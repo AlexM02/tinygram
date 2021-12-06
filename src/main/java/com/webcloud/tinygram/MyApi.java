@@ -269,7 +269,7 @@ public class MyApi {
 
     //BENCHMARK PART
     @ApiMethod(name = "benchmarkCreateUserXFollowers", path = "benchmark/Xfollowers/{nbFollower}", httpMethod = HttpMethod.GET)
-    public Entity createUserXFollowers(@Named("nbFollower") int nbFollower){
+    public Entity createUserXFollowers(@Named("nbFollower") int nbFollower) throws EntityNotFoundException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         String email = randomEmail();
@@ -279,9 +279,19 @@ public class MyApi {
 
         ArrayList<String> followers = new ArrayList<>();
         for(int i =0;i<nbFollower;i++){
-            followers.add(randomEmail());
+            String random = randomEmail();
+            GoogleObject goBis = new GoogleObject(random,"testFamilyName"+random.substring(1,8),
+                    "testGivenName"+random.substring(1,8),"","name"+random.substring(1,8));
+            createUser(goBis);
+            followers.add(random);
+            Post post = new Post(random,"https://firebasestorage.googleapis.com/v0/b/tinygram2021.appspot.com" +
+                    "/o/thomas18lapierre%40gmail.com%2F8f5e8f92-17bf-4834-a6e7-e521c4b415be?alt=media&token=" +
+                    "0d046753-e9ce-4644-ad65-cb2cf405b47b" ,"description test !");
+            addPost(post);
         }
+        followers.add(email);
         e.setProperty("followers",followers);
+        e.setProperty("cptFollower",nbFollower);
         datastore.put(e);
 
         return e;
@@ -294,43 +304,5 @@ public class MyApi {
         email+= "@gmail.com";
         return email;
     }
-
-    @ApiMethod(name = "benchmarkPost", path = "benchmark/post", httpMethod = HttpMethod.POST)
-    public Entity benchmarkPost(Post post) throws EntityNotFoundException {
-        long startTime = System.nanoTime();
-        addPost(post);
-        long stopTime = System.nanoTime();
-        Entity e = new Entity("time");
-        e.setProperty("timeLong",stopTime-startTime);
-        return e;
-    }
-
-    @ApiMethod(name = "benchmarkCreate500Post", path = "benchmark/create500post/{email}", httpMethod = HttpMethod.POST)
-    public void create500Post(Post post,@Named("email") String email) throws EntityNotFoundException, InterruptedException {
-        for(int i = 0; i<250;i++){
-            addPost(post);
-            //pour aller deux fois plus vite
-            post.email = email;
-            addPost(post);
-            /**
-             * pour eviter un probleme de clé car c'est impossible en temps normal qu'un même utilisateur insère
-             * des photos à la même seconde
-             */
-            Thread.sleep(1000);
-        }
-    }
-
-    @ApiMethod(name = "benchmarkGetPost", path = "benchmark/getPost/{nbPost}", httpMethod = HttpMethod.POST)
-    public Entity benchmarkGetPost(@Named("email") String email,
-                              @Named("offset") int offset,@Named("nbPost") int nbPost) throws EntityNotFoundException {
-        long startTime = System.nanoTime();
-        getPost(email,offset,nbPost);
-        long stopTime = System.nanoTime();
-        Entity e = new Entity("time");
-        e.setProperty("timeLong",stopTime-startTime);
-        return e;
-    }
-
-
 
 }
