@@ -21,7 +21,18 @@ Alex MAINGUY - Lucas LELIÈVRE - Thomas LAPIERRE
 
 ## Benchmark
 
-How much time does it take to post a message if followed by 10, 100, and 500 followers? (average on 30 measures)
+### How much time does it take to post a message if followed by 10, 100, and 500 followers? (average on 30 measures)
+
+| Nb followers  | 10               | 100              | 500              |
+|---------------|------------------|------------------|------------------|
+| Moyenne en ns | 94219488,6206897 | 90943026,0344828 | 162242807,517241 |
+| Moyenne en ms | **94ms**             | **91ms**             | **162ms**            |
+
+ **10 personnes :** 94,219 ms
+
+**100 personnes :** 90,943 ms
+
+**500 personnes :** 162,242 ms
 
 How much time does it take to retrieve the last 10,100 and 500 last messages? (average of 30 measures)
 
