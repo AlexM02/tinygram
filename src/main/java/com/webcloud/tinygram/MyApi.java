@@ -296,11 +296,13 @@ public class MyApi {
     }
 
     @ApiMethod(name = "benchmarkPost", path = "benchmark/post", httpMethod = HttpMethod.POST)
-    public long benchmarkPost(Post post) throws EntityNotFoundException {
+    public Entity benchmarkPost(Post post) throws EntityNotFoundException {
         long startTime = System.nanoTime();
         addPost(post);
         long stopTime = System.nanoTime();
-        return stopTime - startTime;
+        Entity e = new Entity("time");
+        e.setProperty("timeLong",stopTime-startTime);
+        return e;
     }
 
     @ApiMethod(name = "benchmarkCreate500Post", path = "benchmark/create500post/{email}", httpMethod = HttpMethod.POST)
@@ -319,12 +321,14 @@ public class MyApi {
     }
 
     @ApiMethod(name = "benchmarkGetPost", path = "benchmark/getPost/{nbPost}", httpMethod = HttpMethod.POST)
-    public long benchmarkPost(@Named("email") String email,
+    public Entity benchmarkPost(@Named("email") String email,
                               @Named("offset") int offset,@Named("nbPost") int nbPost) throws EntityNotFoundException {
         long startTime = System.nanoTime();
         getPost(email,offset,nbPost);
         long stopTime = System.nanoTime();
-        return stopTime - startTime;
+        Entity e = new Entity("time");
+        e.setProperty("timeLong",stopTime-startTime);
+        return e;
     }
 
 
