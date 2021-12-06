@@ -321,7 +321,7 @@ public class MyApi {
     }
 
     @ApiMethod(name = "benchmarkGetPost", path = "benchmark/getPost/{nbPost}", httpMethod = HttpMethod.POST)
-    public Entity benchmarkPost(@Named("email") String email,
+    public Entity benchmarkGetPost(@Named("email") String email,
                               @Named("offset") int offset,@Named("nbPost") int nbPost) throws EntityNotFoundException {
         long startTime = System.nanoTime();
         getPost(email,offset,nbPost);
