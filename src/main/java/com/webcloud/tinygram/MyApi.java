@@ -283,7 +283,7 @@ public class MyApi {
             GoogleObject goBis = new GoogleObject(random,"testFamilyName"+random.substring(1,8),
                     "testGivenName"+random.substring(1,8),"","name"+random.substring(1,8));
             createUser(goBis);
-            addFollow(random,email);
+            addFollow(email,random);
             followers.add(random);
             Post post = new Post(random,"https://firebasestorage.googleapis.com/v0/b/tinygram2021.appspot.com" +
                     "/o/thomas18lapierre%40gmail.com%2F8f5e8f92-17bf-4834-a6e7-e521c4b415be?alt=media&token=" +
